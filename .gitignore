@@ -1,0 +1,12 @@
+.DS_Store
+node_modules/
+dist/
+.turbo/
+__pycache__/
+.venv/
+*.pyc
+.env
+.env.*
+*.age
+*.key
+coverage/
