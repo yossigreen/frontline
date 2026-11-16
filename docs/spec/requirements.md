@@ -166,6 +166,7 @@ stateDiagram-v2
 | PAY-3 | A booking becomes `confirmed` **only** when the payment provider tells us the payment succeeded. Never because the customer says "I paid". |
 | PAY-4 | No customer is ever charged twice for the same booking, even if the provider tells us about the same payment more than once. |
 | PAY-5 | If a payment arrives after the hold expired and the slot was taken, the customer gets an automatic refund and is told. |
+| PAY-6 | While waiting for payment, the slot is held for about 15 min. If the customer doesn't pay in time, the hold expires and the customer is told. |
 
 ### 4.10 Dashboard
 
@@ -274,7 +275,6 @@ Frontline is a learning project, but it is **designed as if** it served 20,000 b
 | Does Israeli law require a specific AI disclosure? (`AI-6`) | Slice 1 |
 | WhatsApp: real send limit per number, "coexistence" (the business keeps using the WhatsApp app on the same number), can a send be duplicated? | Slice 0 spike |
 | How are no-shows recorded: staff mark them, or something automatic? (`REM-3`) | Slice 6 |
-| How long is the hold while waiting for payment? (`PAY-1`) | Slice 7 |
 | Which payment provider? Stripe probably doesn't serve Israeli businesses; check Grow, Tranzila, Cardcom, PayPlus. | Slice 7 |
 
 ## 10. Roadmap (where each feature arrives)
