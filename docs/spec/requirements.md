@@ -83,7 +83,7 @@ Many businesses use the same system at the same time, and each one only ever see
 | BOOK-6 | All times are stored in UTC and shown in the business's local time. [1] |
 | BOOK-7 | One message can mix things ("what's the price, and can I come Tuesday?"). The AI handles both parts. [1] |
 
-**Booking states.** A slot is blocked while the booking is `held`, `awaiting_payment` or `confirmed`.
+**Booking states.** A slot is blocked while the booking is `held`, `awaiting_payment` or `confirmed`. A `cancelled` booking keeps a reason (for example `customer_cancel`, `late_cancel`, `rejected`, `no_show`), so stats can tell them apart.
 
 ```mermaid
 stateDiagram-v2
@@ -95,7 +95,7 @@ stateDiagram-v2
     held --> cancelled: approval rejected
     awaiting_payment --> confirmed: payment provider confirms
     awaiting_payment --> expired: not paid in time
-    confirmed --> cancelled: customer or staff cancels
+    confirmed --> cancelled: customer or staff cancels, or staff mark a no-show
 ```
 
 ### 4.4 Reschedule and cancel
@@ -104,6 +104,7 @@ stateDiagram-v2
 |---|---|
 | CHG-1 | The AI reschedules or cancels alone if the business policy allows it. [1] |
 | CHG-2 | Outside the policy (for example, a late cancel), the AI asks for an approval (`APPR-1`). [6] |
+| CHG-3 | When an out-of-policy cancel is approved, the business keeps the deposit, if there was one. Without a deposit, there is no automatic consequence. [7] |
 
 ### 4.5 Reminders and no-shows
 
@@ -111,7 +112,9 @@ stateDiagram-v2
 |---|---|
 | REM-1 | Customers get a reminder before the appointment. The business chooses when. [6] |
 | REM-2 | Reminders are plain scheduled messages, not AI. They must be sent once, on time, and never twice. [6] |
-| REM-3 | No-shows are counted per customer and shown to staff and in stats. [6] |
+| REM-3 | We assume every customer came. Staff mark a no-show in the dashboard. [6] |
+| REM-4 | A no-show is treated like an approved out-of-policy cancel: the booking becomes `cancelled` with reason `no_show`, and the deposit is kept (`CHG-3`). [6, 7] |
+| REM-5 | No-shows are counted per customer and shown to staff and in stats, separately from late cancels. [6] |
 
 ### 4.6 Calendar sync (both ways)
 
@@ -274,7 +277,7 @@ Frontline is a learning project, but it is **designed as if** it served 20,000 b
 |---|---|
 | Does Israeli law require a specific AI disclosure? (`AI-6`) | Slice 1 |
 | WhatsApp: real send limit per number, "coexistence" (the business keeps using the WhatsApp app on the same number), can a send be duplicated? | Slice 0 spike |
-| How are no-shows recorded: staff mark them, or something automatic? (`REM-3`) | Slice 6 |
+| Can staff also mark a no-show from WhatsApp, and on which message would the button be? (`REM-3`) | Slice 6 |
 | Which payment provider? Stripe probably doesn't serve Israeli businesses; check Grow, Tranzila, Cardcom, PayPlus. | Slice 7 |
 
 ## 10. Roadmap (where each feature arrives)
