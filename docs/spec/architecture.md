@@ -9,7 +9,7 @@ Each section has the same shape:
 - **Choice:** what we do.
 - **Rejected:** the main alternatives, in one line each. The full reasoning ("why") goes into the ADRs, which you write.
 
-A new term is **bold** the first time, with a short plain explanation. Items marked **(proposed)** are my suggestions, not yet decided by you. They are all listed in section 13.
+A new term is **bold** the first time, with a short plain explanation. Decisions made during review of this document are listed in section 13.
 
 ---
 
@@ -152,8 +152,8 @@ sequenceDiagram
 ```
 
 Things to notice:
-1. **channel answers WhatsApp after Kafka has stored the message on 3 machines, but before any AI work.** So the 500 ms rule (`NFR-1`) holds even when the AI is slow, and an accepted message is never lost (`NFR-2`). **(proposed)** channel has no database write in this step, so it writes to Kafka directly. The outbox (section 6) is needed only when a service changes its database *and* announces it.
-2. **conversation decides first, the AI second.** If a human has the conversation, no AI turn is requested (`HAND-6`). **(proposed)**
+1. **channel answers WhatsApp after Kafka has stored the message on 3 machines, but before any AI work.** So the 500 ms rule (`NFR-1`) holds even when the AI is slow, and an accepted message is never lost (`NFR-2`). channel has no database write in this step, so it writes to Kafka directly. The outbox (section 6) is needed only when a service changes its database *and* announces it.
+2. **conversation decides first, the AI second.** If a human has the conversation, no AI turn is requested (`HAND-6`).
 3. **The AI never writes to the database itself.** It calls a booking tool, and the booking service checks the rules (section 5).
 4. **"Booked" is said only after Google Calendar has the event** (`BOOK-4`).
 
@@ -167,7 +167,7 @@ Debounce (`FAQ-4`, waiting ~3 s for more messages) happens before "AI turn reque
 
 **Choice**
 - **3 brokers** (Kafka servers), and every event is stored on all 3 (**replication factor 3**). One machine can die without losing anything. (`NFR-2`)
-- A topic is split into **partitions** (parallel lanes). Events with the same **key** always go to the same lane, in order. `messages.inbound` has **48 partitions**. The key is **business + customer** **(proposed)**, because the conversation ID isn't known yet when the message arrives. Same customer, same lane, so order is kept (`NFR-3`), while different customers run in parallel.
+- A topic is split into **partitions** (parallel lanes). Events with the same **key** always go to the same lane, in order. `messages.inbound` has **48 partitions**. The key is **business + customer**, because the conversation ID isn't known yet when the message arrives. Same customer, same lane, so order is kept (`NFR-3`), while different customers run in parallel.
 - Events are kept **~7 days** (`PRIV-6`). Long enough to replay after a bug, short enough for privacy.
 - Events are defined with **Protobuf** (a strict typed format, like TypeScript types that every language understands). **Buf** checks in CI that we never change an event in a way that breaks existing readers.
 
@@ -393,9 +393,9 @@ Webhooks reach the Mac through **Cloudflare Tunnel** (a public URL that forwards
 2. **WhatsApp send limits** on the shared staff number.
 3. **Google Calendar push notifications** expire and must be renewed, for 60,000 calendars.
 
-## 13. Proposed by Claude: please decide
+## 13. Decided in review (2026-11-16)
 
-These are not in our earlier decisions. I filled them in so the flow is complete.
+These were not in the earlier design decisions. Claude proposed them to complete the flow, and they were approved in review.
 
 | # | Proposal | Why |
 |---|---|---|
